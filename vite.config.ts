@@ -1,14 +1,25 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { copyFileSync } from 'fs';
 import { join } from 'path';
 
 const root = __dirname;
 const srcRoot = join(__dirname, 'src');
+const outDir = join(root, 'dist');
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root,
-  base: './',
-  plugins: [react()],
+  base: command === 'build' ? '/my-little-baby/' : '/',
+  plugins: [
+    react(),
+    {
+      name: 'github-pages-spa-fallback',
+      apply: 'build',
+      closeBundle() {
+        copyFileSync(join(outDir, 'index.html'), join(outDir, '404.html'));
+      }
+    }
+  ],
   resolve: {
     alias: {
       '@': srcRoot,
@@ -16,11 +27,11 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: join(root, 'dist'),
+    outDir,
     emptyOutDir: true,
     rollupOptions: { external: [''] }
   },
   server: {
     port: 3000
   }
-});
+}));
