@@ -108,6 +108,9 @@ export default function NotificationsPage() {
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Configuração</div>
           <h2 className="mt-2 text-xl font-semibold text-slate-900">Preferências</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Os controles abaixo alteram apenas a prévia; notificações do navegador ou por e-mail não são enviadas.
+          </p>
 
           <div className="mt-5 space-y-4">
             {[

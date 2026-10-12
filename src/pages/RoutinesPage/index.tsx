@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FiFilter, FiHeart, FiMoon, FiPlus, FiThermometer, FiWind } from 'react-icons/fi';
 import AppShell from '../AppShell';
-import { mockApi, type RoutineEntry } from '../../mockApi';
+import { getTodayDateString, mockApi, type RoutineEntry } from '../../mockApi';
 import { useDemoUi } from '../../components/DemoUi';
 
 const routineSummary = [
-  { label: 'Amamentação', value: '3 registros', detail: 'Última às 08:10', icon: FiHeart },
-  { label: 'Mamadeira', value: '1 registro', detail: '180 ml consumidos', icon: FiWind },
-  { label: 'Ordenha', value: '2 sessões', detail: 'Total 180 ml', icon: FiThermometer },
-  { label: 'Sono', value: '3 ciclos', detail: '3h 40m total', icon: FiMoon }
+  { label: 'Amamentação', icon: FiHeart },
+  { label: 'Mamadeira', icon: FiWind },
+  { label: 'Ordenha', icon: FiThermometer },
+  { label: 'Sono', icon: FiMoon }
 ];
 
 export default function RoutinesPage() {
@@ -40,6 +40,7 @@ export default function RoutinesPage() {
           type: 'select',
           options: ['Amamentação', 'Mamadeira', 'Ordenha', 'Fralda', 'Sono', 'Humor']
         },
+        { name: 'date', label: 'Data', type: 'date', value: getTodayDateString(), required: true },
         { name: 'title', label: 'O que aconteceu?', type: 'text', placeholder: 'Ex.: soneca da tarde', required: true },
         { name: 'time', label: 'Horário', type: 'time', required: true },
         { name: 'description', label: 'Observação', type: 'textarea', placeholder: 'Adicione um detalhe (opcional)' }
@@ -48,13 +49,18 @@ export default function RoutinesPage() {
         const time = values.time || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         const entry = {
           id: `demo-${Date.now()}`,
+          date: values.date,
           time,
           title: values.title,
           description: values.description || 'Adicionado agora no modo demonstração.',
           tag: values.tag
         };
         mockApi.addRoutineEntry(entry);
-        setEntries((current) => [entry, ...current]);
+        setEntries((current) =>
+          [...current, entry].sort((first, second) =>
+            `${second.date}T${second.time}`.localeCompare(`${first.date}T${first.time}`)
+          )
+        );
         return 'Registro adicionado à rotina desta sessão.';
       }
     });
@@ -79,7 +85,7 @@ export default function RoutinesPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
             <FiFilter />
-            Hoje
+            Histórico
           </div>
           <div className="flex flex-wrap gap-2 text-xs text-slate-600">
             {['Todas', 'Amamentação', 'Mamadeira', 'Ordenha', 'Fralda', 'Sono', 'Humor'].map((tag) => (
@@ -102,16 +108,25 @@ export default function RoutinesPage() {
       </section>
 
       <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {routineSummary.map(({ label, value, detail, icon: Icon }) => (
-          <article key={label} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
-              <Icon />
-            </div>
-            <div className="mt-4 text-sm text-slate-500">{label}</div>
-            <div className="mt-2 text-2xl font-semibold text-slate-900">{value}</div>
-            <div className="mt-1 text-xs text-slate-500">{detail}</div>
-          </article>
-        ))}
+        {routineSummary.map(({ label, icon: Icon }) => {
+          const matchingEntries = entries.filter(({ tag }) => tag === label);
+          const latestEntry = matchingEntries[0];
+
+          return (
+            <article key={label} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
+                <Icon />
+              </div>
+              <div className="mt-4 text-sm text-slate-500">{label}</div>
+              <div className="mt-2 text-2xl font-semibold text-slate-900">
+                {matchingEntries.length} {matchingEntries.length === 1 ? 'registro' : 'registros'}
+              </div>
+              <div className="mt-1 text-xs text-slate-500">
+                {latestEntry ? `Último: ${latestEntry.date} · ${latestEntry.time}` : 'Sem registro na prévia'}
+              </div>
+            </article>
+          );
+        })}
       </section>
 
       <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
@@ -119,10 +134,11 @@ export default function RoutinesPage() {
         <div className="space-y-4">
           {entries
             .filter(({ tag }) => activeFilter === 'Todas' || tag === activeFilter)
-            .map(({ id, time, title, description, tag }) => (
+            .map(({ id, date, time, title, description, tag }) => (
               <div key={id} className="flex gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex w-16 shrink-0 flex-col items-center text-center">
                   <div className="text-sm font-medium text-slate-900">{time}</div>
+                  <div className="mt-1 text-[10px] text-slate-500">{date}</div>
                   <div className="mt-1 h-8 w-px bg-slate-200" />
                 </div>
 

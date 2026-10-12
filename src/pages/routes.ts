@@ -11,6 +11,7 @@ import PrivacyPolicyPage from './PrivacyPolicyPage';
 import ReportsPage from './ReportsPage';
 import RoutinesPage from './RoutinesPage';
 import SettingsPage from './SettingsPage';
+import NotFoundPage from './NotFoundPage';
 
 const routes: {
   path: string;
@@ -28,6 +29,7 @@ const routes: {
   { path: 'app/notifications', Component: NotificationsPage },
   { path: 'app/settings', Component: SettingsPage },
   { path: 'app/parent-linking', Component: ParentLinkingPage },
-  { path: 'app/privacy-policy', Component: PrivacyPolicyPage }
+  { path: 'app/privacy-policy', Component: PrivacyPolicyPage },
+  { path: '*', Component: NotFoundPage }
 ];
 export default routes;

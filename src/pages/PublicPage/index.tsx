@@ -6,9 +6,9 @@ import Header from './Header';
 import TagText from './Header/TagText';
 
 const trustItems = [
-  'Registro de rotina infantil em poucos cliques',
-  'Acesso compartilhado com pais e cuidadores',
-  'Privacidade e controle de permissões por perfil'
+  'Resumo e histórico de rotina em um só lugar',
+  'Exemplos de marcos e lembretes',
+  'Prévia local, sem conta ou sincronização'
 ];
 
 export default function PublicPage() {
@@ -60,6 +60,11 @@ export default function PublicPage() {
                 Já tenho conta
               </Link>
             </div>
+
+            <p className="mt-4 max-w-lg text-sm text-slate-500">
+              Prévia interativa: os dados são fictícios e as alterações não são salvas. Não informe dados reais de
+              crianças.
+            </p>
 
             <div className="landing-trust-list mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
               {trustItems.map((item) => (

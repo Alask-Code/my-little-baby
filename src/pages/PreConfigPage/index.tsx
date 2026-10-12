@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiArrowRight, FiCheck, FiHeart, FiMoon, FiUser } from 'react-icons/fi';
 import { useDemoUi } from '../../components/DemoUi';
-import { mockApi } from '../../mockApi';
+import { getTodayDateString, mockApi } from '../../mockApi';
 
 const steps = [
   { label: 'Perfil do bebê', description: 'Nome, data de nascimento e foto', icon: FiUser },
@@ -18,6 +18,13 @@ export default function PreConfigPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const name = String(form.get('babyName') ?? '').trim();
+    const birthDate = String(form.get('birthDate') ?? '');
+    const preferences = {
+      sex: String(form.get('babySex') ?? ''),
+      notes: String(form.get('babyNotes') ?? '').trim(),
+      volumeUnit: String(form.get('volumeUnit') ?? ''),
+      notifications: String(form.get('notifications') ?? '')
+    };
 
     openDialog({
       title: `Tudo pronto${name ? ` para ${name}` : ''}?`,
@@ -25,7 +32,7 @@ export default function PreConfigPage() {
       submitLabel: 'Abrir painel',
       fields: [],
       onSubmit: () => {
-        mockApi.updateBabyName(name);
+        mockApi.updateBabyProfile(name, birthDate, preferences);
         navigate('/app/');
         return 'Perfil de demonstração configurado; os dados continuam apenas na memória local.';
       }
@@ -93,6 +100,7 @@ export default function PreConfigPage() {
                     id="birthDate"
                     name="birthDate"
                     type="date"
+                    max={getTodayDateString()}
                     required
                     className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
                   />
@@ -103,6 +111,7 @@ export default function PreConfigPage() {
                   Sexo (opcional)
                   <select
                     id="babySex"
+                    name="babySex"
                     className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
                   >
                     <option>Não informar</option>
@@ -119,6 +128,7 @@ export default function PreConfigPage() {
                 Observações
                 <textarea
                   id="babyNotes"
+                  name="babyNotes"
                   rows={4}
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm placeholder:text-slate-400"
                   placeholder="Ex.: gosta de dormir com a música baixa e leva mais tempo para adormecer."
@@ -132,6 +142,7 @@ export default function PreConfigPage() {
                   Unidade para volume
                   <select
                     id="volumeUnit"
+                    name="volumeUnit"
                     className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
                   >
                     <option>ml</option>

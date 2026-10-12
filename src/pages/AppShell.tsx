@@ -39,7 +39,8 @@ type AppShellProps = {
 export default function AppShell({ title, subtitle, children, actions }: AppShellProps) {
   const { pathname } = useLocation();
   const [profile, setProfile] = useState<BabyProfile>({
-    name: 'Luna',
+    name: 'Maria Cecilia',
+    birthDate: '2026-03-11',
     ageLabel: '7 meses · 1 dia',
     role: 'Responsável principal'
   });
@@ -133,12 +134,13 @@ export default function AppShell({ title, subtitle, children, actions }: AppShel
             </div>
           </header>
 
-          {import.meta.env.DEV ? (
-            <div className="demo-mode-note">
-              <span className="demo-badge">PRÉVIA LOCAL</span>
-              <span>Dados simulados; alterações ficam na memória e não são sincronizadas.</span>
-            </div>
-          ) : null}
+          <div className="demo-mode-note">
+            <span className="demo-badge">PRÉVIA LOCAL</span>
+            <span>
+              Dados de exemplo. Não use informações reais: não há autenticação, armazenamento seguro nem sincronização.
+              Alterações desaparecem ao recarregar.
+            </span>
+          </div>
 
           <div className="page-content">{children}</div>
           <footer className="app-footer">Um espaço tranquilo para acompanhar cada pequena conquista.</footer>

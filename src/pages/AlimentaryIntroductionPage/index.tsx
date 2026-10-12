@@ -60,6 +60,11 @@ export default function AlimentaryIntroductionPage() {
         ))}
       </section>
 
+      <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+        Material demonstrativo sem fontes, data de revisão ou validação clínica cadastradas. Não use estes exemplos como
+        orientação para alimentar uma criança.
+      </p>
+
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-2 text-rose-500">
@@ -81,8 +86,8 @@ export default function AlimentaryIntroductionPage() {
         </div>
 
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Fonte</div>
-          <h2 className="mt-2 text-xl font-semibold text-slate-900">Orientação reforçada</h2>
+          <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Revisão editorial</div>
+          <h2 className="mt-2 text-xl font-semibold text-slate-900">Fontes ainda não cadastradas</h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
             O material educacional do My Little Baby busca informar de forma clara e responsável, sem substituir a
             avaliação individual de profissionais de saúde e nutrição.

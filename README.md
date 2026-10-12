@@ -1,75 +1,28 @@
-# React + TypeScript + Vite
+# My Little Baby
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Prévia local em React, TypeScript e Vite para uma plataforma de acompanhamento infantil. A interface cobre os fluxos visuais de resumo, rotina, desenvolvimento, lembretes, conteúdo educativo, relatórios, cuidadores e configurações.
 
-Currently, two official plugins are available:
+## Executar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm install
+npm run start
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Verificações disponíveis:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm run lint
+npm run typecheck
+npm run build
 ```
+
+## Aparência
+
+Em **Configurações**, escolha o tema claro, escuro ou o modo do sistema e uma cor de destaque rosa, sálvia ou lavanda. A preferência é salva localmente neste dispositivo.
+
+## Limites desta versão
+
+Esta é uma demonstração de frontend com dados fictícios mantidos apenas em memória. Não há backend, persistência, autenticação, autorização, compartilhamento, notificações, armazenamento privado de fotos ou exclusão/exportação segura de conta. As alterações desaparecem ao recarregar a página. Não informe dados pessoais ou de saúde reais de crianças.
+
+O conteúdo educativo e os valores de exemplo não têm referências nem revisão clínica cadastradas e não devem orientar decisões de saúde. Antes de qualquer uso real, é necessário implementar e validar os requisitos de autenticação, privacidade, segurança, armazenamento, conteúdo e gestão de dados descritos em [Software Design.pdf](./Software%20Design.pdf).

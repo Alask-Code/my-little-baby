@@ -86,6 +86,11 @@ function AuthCard({ mode }: { mode: AuthMode }) {
               </p>
             </div>
 
+            <p className="mt-4 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+              Acesso apenas demonstrativo: não existe conta nem autenticação. Use dados fictícios; não informe sua senha
+              real.
+            </p>
+
             <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               {isRegister ? (
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">

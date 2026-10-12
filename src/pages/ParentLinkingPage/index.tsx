@@ -5,7 +5,7 @@ import { mockApi, type Caregiver } from '../../mockApi';
 import { useDemoUi } from '../../components/DemoUi';
 
 export default function ParentLinkingPage() {
-  const { openDialog, notify } = useDemoUi();
+  const { openDialog } = useDemoUi();
   const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
 
   useEffect(() => {
@@ -45,20 +45,10 @@ export default function ParentLinkingPage() {
     });
   };
 
-  const copyInviteLink = async () => {
-    try {
-      if (!navigator.clipboard) throw new Error('A área de transferência não está disponível neste navegador.');
-      await navigator.clipboard.writeText('https://mylittlebaby.app/invite/luna-family');
-      notify('Link de demonstração copiado.');
-    } catch {
-      notify('Não foi possível copiar automaticamente. Selecione e copie o link exibido.');
-    }
-  };
-
   return (
     <AppShell
       title="Pessoas autorizadas"
-      subtitle="Compartilhe a rotina com responsáveis e cuidadores de forma segura."
+      subtitle="Prévia visual de cuidadores; nenhum convite ou permissão real é concedido."
       actions={
         <button
           type="button"
@@ -122,16 +112,18 @@ export default function ParentLinkingPage() {
           <h2 className="mt-2 text-xl font-semibold text-slate-900">Gerenciar compartilhamento</h2>
 
           <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4">
-            <div className="text-sm text-slate-600">Link de convite</div>
-            <div className="mt-2 break-all rounded-xl bg-white p-3 text-xs text-slate-500">
-              https://mylittlebaby.app/invite/luna-family
-            </div>
-            <button className="demo-button demo-button-secondary mt-3" onClick={copyInviteLink} type="button">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
               <FiLink2 />
-              Copiar link
-            </button>
+              Convites reais não estão disponíveis
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              Os nomes e permissões abaixo são exemplos e não controlam o acesso aos dados.
+            </p>
           </div>
 
+          <div className="mt-5 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+            Exemplos de permissões (não aplicadas)
+          </div>
           <div className="mt-5 space-y-3">
             {[
               'Pode registrar rotina e lembretes',

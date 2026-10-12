@@ -95,6 +95,11 @@ export default function DevelopmentPage() {
         </button>
       }
     >
+      <p className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+        Marcos e faixas exibidos são exemplos sem fontes ou validação clínica. A ausência de um marco registrado não
+        indica atraso, e estas informações não substituem uma avaliação profissional.
+      </p>
+
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
@@ -140,6 +145,7 @@ export default function DevelopmentPage() {
             <div>
               <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Galeria</div>
               <h2 className="mt-2 text-xl font-semibold text-slate-900">Memórias</h2>
+              <p className="mt-1 text-xs text-slate-500">Símbolos ilustrativos; envio privado de fotos indisponível.</p>
             </div>
             <button
               aria-label="Adicionar memória"

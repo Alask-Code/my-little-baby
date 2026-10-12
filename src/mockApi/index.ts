@@ -11,8 +11,13 @@ export type PublicHighlight = {
 
 export type BabyProfile = {
   name: string;
+  birthDate: string;
   ageLabel: string;
   role: string;
+  sex?: string;
+  notes?: string;
+  volumeUnit?: string;
+  notifications?: string;
 };
 
 export type DashboardCard = {
@@ -38,6 +43,7 @@ export type Reminder = {
 
 export type RoutineEntry = {
   id: string;
+  date: string;
   time: string;
   title: string;
   description: string;
@@ -102,22 +108,78 @@ const publicHighlights: PublicHighlight[] = [
   },
   {
     id: 'education',
-    title: 'Conteúdo educativo confiável',
-    text: 'Aprenda sobre introdução alimentar, BLW, sinais de prontidão e higiene.'
+    title: 'Conteúdo educativo em desenvolvimento',
+    text: 'Exemplos introdutórios sobre alimentação, ainda sem fontes e revisão clínica cadastradas.'
   }
 ];
 
+const getLocalDate = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const getTodayDateString = () => getLocalDate();
+
+const formatBabyAge = (birthDate: string, referenceDate = new Date()) => {
+  const [year, month, day] = birthDate.split('-').map(Number);
+  const birth = new Date(year, month - 1, day);
+  const reference = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+
+  if (
+    !year ||
+    !month ||
+    !day ||
+    birth.getFullYear() !== year ||
+    birth.getMonth() !== month - 1 ||
+    birth.getDate() !== day ||
+    birth > reference
+  ) {
+    throw new Error('A data de nascimento deve ser válida e não pode estar no futuro.');
+  }
+
+  let months = (reference.getFullYear() - birth.getFullYear()) * 12 + reference.getMonth() - birth.getMonth();
+  const getMonthAnchor = (monthCount: number) => {
+    const anchorMonth = new Date(birth.getFullYear(), birth.getMonth() + monthCount, 1);
+    const lastDayOfMonth = new Date(anchorMonth.getFullYear(), anchorMonth.getMonth() + 1, 0).getDate();
+    return new Date(anchorMonth.getFullYear(), anchorMonth.getMonth(), Math.min(birth.getDate(), lastDayOfMonth));
+  };
+  if (reference < getMonthAnchor(months)) months -= 1;
+
+  const monthAnchor = getMonthAnchor(months);
+  const days =
+    (Date.UTC(reference.getFullYear(), reference.getMonth(), reference.getDate()) -
+      Date.UTC(monthAnchor.getFullYear(), monthAnchor.getMonth(), monthAnchor.getDate())) /
+    86400000;
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? 'ano' : 'anos'} · ${remainingMonths} ${remainingMonths === 1 ? 'mês' : 'meses'}`;
+  }
+
+  return `${months} ${months === 1 ? 'mês' : 'meses'} · ${days} ${days === 1 ? 'dia' : 'dias'}`;
+};
+
 const babyProfile: BabyProfile = {
   name: 'Maria Cecilia',
-  ageLabel: '7 meses · 1 dia',
+  birthDate: '2026-03-11',
+  ageLabel: formatBabyAge('2026-03-11'),
   role: 'Responsável principal'
 };
 
-const dashboardCards: DashboardCard[] = [
+const defaultDashboardCards: DashboardCard[] = [
   { id: 'feeding', label: 'Última mamada', value: '08:10', detail: '30 min · seio direito', tone: 'rose' },
   { id: 'diaper', label: 'Última troca', value: '07:40', detail: 'Fralda seca', tone: 'amber' },
-  { id: 'sleep', label: 'Sono atual', value: '1h 20m', detail: 'Descanso do período da manhã', tone: 'sky' },
-  { id: 'milk', label: 'Leite armazenado', value: '216 ml', detail: '5 lotes ativos', tone: 'emerald' }
+  { id: 'sleep', label: 'Último sono', value: '06:30', detail: 'Sono da manhã · 1h20', tone: 'sky' },
+  {
+    id: 'milk',
+    label: 'Estoque de exemplo',
+    value: '216 ml',
+    detail: 'Valor fictício · controle indisponível',
+    tone: 'emerald'
+  }
 ];
 
 const quickActions: QuickAction[] = [
@@ -127,15 +189,10 @@ const quickActions: QuickAction[] = [
   { id: 'education', label: 'Ver conteúdo', href: '/app/alimentary-introduction' }
 ];
 
-const reminders: Reminder[] = [
-  { id: 'order', title: 'Ordenha programada', time: '14:30', description: 'Um lembrete para a sessão da tarde' },
-  { id: 'meal', title: 'Rotina de alimentação', time: '17:00', description: 'Registrar refeição e humor' },
-  { id: 'milestone', title: 'Revisar marcos', time: 'Hoje', description: 'Adicionar foto recente do desenvolvimento' }
-];
-
 const routineEntries: RoutineEntry[] = [
   {
     id: 'feeding-1',
+    date: getLocalDate(),
     time: '08:10',
     title: 'Mamada · 30 min',
     description: 'Seio direito e esquerdo. Concluída sem interrupções.',
@@ -143,6 +200,7 @@ const routineEntries: RoutineEntry[] = [
   },
   {
     id: 'diaper-1',
+    date: getLocalDate(),
     time: '07:40',
     title: 'Troca de fralda',
     description: 'Fralda seca, sem sinais de desconforto.',
@@ -150,12 +208,20 @@ const routineEntries: RoutineEntry[] = [
   },
   {
     id: 'sleep-1',
+    date: getLocalDate(),
     time: '06:30',
     title: 'Sono da manhã',
     description: 'Adormeceu após alimentação. Durou 1h20.',
     tag: 'Sono'
   },
-  { id: 'mood-1', time: '06:00', title: 'Humor', description: 'Feliz e sorridente durante o banho.', tag: 'Humor' }
+  {
+    id: 'mood-1',
+    date: getLocalDate(),
+    time: '06:00',
+    title: 'Humor',
+    description: 'Feliz e sorridente durante o banho.',
+    tag: 'Humor'
+  }
 ];
 
 const milestones: Milestone[] = [
@@ -193,12 +259,8 @@ const milestones: Milestone[] = [
   }
 ];
 
-const reportStats: ReportStat[] = [
-  { id: 'feedings', label: 'Mamadas', value: '12', detail: 'Últimos 7 dias' },
-  { id: 'milk', label: 'Leite ordenhado', value: '1.3L', detail: 'Acumulado semanal' },
-  { id: 'sleep', label: 'Horas de sono', value: '31h', detail: 'Média por semana' },
-  { id: 'diaper', label: 'Trocas de fralda', value: '24', detail: 'Em 24h' }
-];
+const sortRoutineEntries = (entries: RoutineEntry[]) =>
+  [...entries].sort((first, second) => `${second.date}T${second.time}`.localeCompare(`${first.date}T${first.time}`));
 
 const notificationItems: NotificationItem[] = [
   { id: 'order', title: 'Ordenha da tarde', time: '14:30', type: 'Agendada', active: true },
@@ -243,23 +305,23 @@ const educationalModules: EducationalModule[] = [
 const privacySections: PrivacySection[] = [
   {
     id: 'collection',
-    title: '1. Coleta de dados',
-    text: 'Coletamos apenas dados necessários para o funcionamento da rotina infantil, incluindo dados do perfil do bebê, registros de alimentação, sono e fotos quando autorizadas.'
+    title: 'Dados utilizados nesta prévia',
+    text: 'Os perfis e registros exibidos são exemplos fictícios. Os dados que você inserir ficam apenas na memória desta página e são perdidos ao recarregar.'
   },
   {
     id: 'usage',
-    title: '2. Uso e compartilhamento',
-    text: 'As informações ficam acessíveis somente para usuários autorizados da conta. Fotos e registros podem ser compartilhados somente conforme permissão definida por cada responsável.'
+    title: 'Sem conta ou compartilhamento real',
+    text: 'Cadastro, login, convites e permissões são apenas demonstrações visuais. Não existe autenticação, conta de usuário, API de compartilhamento ou autorização de acesso.'
   },
   {
     id: 'security',
-    title: '3. Segurança',
-    text: 'Utilizamos medidas de segurança para proteger o acesso autenticado aos dados, incluindo controle por perfil e autenticação de usuários.'
+    title: 'Sem armazenamento seguro',
+    text: 'Esta versão não salva dados em servidor nem fornece armazenamento privado de fotos. Não insira informações pessoais ou de saúde reais de crianças.'
   },
   {
     id: 'rights',
-    title: '4. Direitos e controle',
-    text: 'Você pode revisar, editar, excluir ou limitar a visibilidade de dados e fotos, bem como retirar permissões de responsáveis ou cuidadores.'
+    title: 'Próximos passos para produção',
+    text: 'Antes de uso real, será necessário implementar e validar autenticação, autorização no servidor, armazenamento privado, gestão de consentimento, exportação e exclusão de dados.'
   }
 ];
 
@@ -280,7 +342,19 @@ export const mockApi = {
   },
   getDashboardCards: async () => {
     await wait();
-    return dashboardCards;
+    const latestEntryFor = (tag: string) => demoRoutineEntries.find((entry) => entry.tag === tag);
+    return defaultDashboardCards.map((card) => {
+      const tagByCard: Record<string, string> = {
+        feeding: 'Amamentação',
+        diaper: 'Fralda',
+        sleep: 'Sono'
+      };
+      const latestEntry = tagByCard[card.id] ? latestEntryFor(tagByCard[card.id]) : undefined;
+
+      return latestEntry
+        ? { ...card, value: latestEntry.time, detail: latestEntry.description || latestEntry.title }
+        : card;
+    });
   },
   getQuickActions: async () => {
     await wait();
@@ -288,14 +362,21 @@ export const mockApi = {
   },
   getReminders: async () => {
     await wait();
-    return reminders;
+    return demoNotificationItems
+      .filter(({ active }) => active)
+      .map(({ id, title, time, type }) => ({
+        id,
+        title,
+        time,
+        description: `${type} · lembrete de demonstração`
+      }));
   },
   getRoutineEntries: async () => {
     await wait();
-    return [...demoRoutineEntries];
+    return sortRoutineEntries(demoRoutineEntries);
   },
   addRoutineEntry: (entry: RoutineEntry) => {
-    demoRoutineEntries = [entry, ...demoRoutineEntries];
+    demoRoutineEntries = sortRoutineEntries([...demoRoutineEntries, entry]);
   },
   getMilestones: async () => {
     await wait();
@@ -306,7 +387,17 @@ export const mockApi = {
   },
   getReportStats: async () => {
     await wait();
-    return reportStats;
+    const counts = demoRoutineEntries.reduce<Record<string, number>>(
+      (totals, entry) => ({ ...totals, [entry.tag]: (totals[entry.tag] ?? 0) + 1 }),
+      {}
+    );
+
+    return Object.entries(counts).map(([tag, count]) => ({
+      id: tag,
+      label: tag,
+      value: String(count),
+      detail: `${count} ${count === 1 ? 'registro' : 'registros'} na demonstração`
+    }));
   },
   getNotificationItems: async () => {
     await wait();
@@ -329,6 +420,13 @@ export const mockApi = {
   },
   updateBabyName: (name: string) => {
     demoBabyProfile = { ...demoBabyProfile, name };
+  },
+  updateBabyProfile: (
+    name: string,
+    birthDate: string,
+    preferences: Pick<BabyProfile, 'sex' | 'notes' | 'volumeUnit' | 'notifications'>
+  ) => {
+    demoBabyProfile = { ...demoBabyProfile, ...preferences, name, birthDate, ageLabel: formatBabyAge(birthDate) };
   },
   getEducationalModules: async () => {
     await wait();

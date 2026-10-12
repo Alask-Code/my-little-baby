@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiActivity, FiBell, FiBookOpen, FiClock, FiDroplet, FiHeart, FiPlus, FiSun } from 'react-icons/fi';
 import AppShell from '../AppShell';
-import { mockApi, type DashboardCard, type QuickAction, type Reminder } from '../../mockApi';
+import { getTodayDateString, mockApi, type DashboardCard, type QuickAction, type Reminder } from '../../mockApi';
 import { useDemoUi } from '../../components/DemoUi';
 
 export default function HomePage() {
@@ -48,6 +48,7 @@ export default function HomePage() {
       onSubmit: (values) => {
         mockApi.addRoutineEntry({
           id: `demo-${Date.now()}`,
+          date: getTodayDateString(),
           time: values.time,
           title: values.type,
           description: values.notes || 'Adicionado agora no modo demonstração.',

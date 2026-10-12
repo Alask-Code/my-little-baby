@@ -79,5 +79,13 @@
     "dist/",
     "main/",
     "src/out/"
+  ],
+  "overrides": [
+    {
+      "files": ["vite.config.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+      }
+    }
   ]
 }
