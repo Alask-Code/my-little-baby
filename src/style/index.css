@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@config '../../tailwind.config.js';
+
+:root {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #0f172a;
+  background: #fff7fb;
+}
+
+* {
+  box-sizing: border-box;
+  transition: all 300ms;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff7fb 0%, #fff 50%, #fff7ed 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+}
