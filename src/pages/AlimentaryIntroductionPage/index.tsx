@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiBookOpen, FiCheck, FiShield } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type EducationalModule } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 const checklist = [
   'Supervisão durante a refeição',
@@ -11,6 +12,7 @@ const checklist = [
 ];
 
 export default function AlimentaryIntroductionPage() {
+  const { openDialog } = useDemoUi();
   const [modules, setModules] = useState<EducationalModule[]>([]);
 
   useEffect(() => {
@@ -40,6 +42,20 @@ export default function AlimentaryIntroductionPage() {
             </div>
             <div className="mt-4 text-lg font-medium text-slate-900">{title}</div>
             <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
+            <button
+              className="demo-button demo-button-secondary mt-4"
+              onClick={() =>
+                openDialog({
+                  title,
+                  description: text,
+                  submitLabel: 'Entendi',
+                  fields: []
+                })
+              }
+              type="button"
+            >
+              Ler resumo
+            </button>
           </article>
         ))}
       </section>

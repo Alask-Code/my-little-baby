@@ -1,17 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiArrowRight, FiLock, FiMail, FiUser } from 'react-icons/fi';
+import { useDemoUi } from '../../components/DemoUi';
 
 type AuthMode = 'login' | 'register';
 
 function AuthCard({ mode }: { mode: AuthMode }) {
   const [isRegister, setIsRegister] = useState(mode === 'register');
+  const { openDialog, notify } = useDemoUi();
+  const navigate = useNavigate();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+
+    if (isRegister && form.get('password') !== form.get('passwordConfirmation')) {
+      notify('As senhas não coincidem. Confira os campos e tente novamente.');
+      return;
+    }
+
+    openDialog({
+      title: isRegister ? 'Cadastro de demonstração' : 'Acesso de demonstração',
+      description: 'Esta prévia não cria conta nem envia dados. Você pode continuar sem autenticação real.',
+      submitLabel: isRegister ? 'Continuar configuração' : 'Entrar na prévia',
+      fields: [],
+      onSubmit: () => {
+        navigate(isRegister ? '/app/preconfig' : '/app/');
+        return isRegister ? 'Vamos preparar o perfil do bebê.' : 'Bem-vinda à prévia da família.';
+      }
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-rose-50 via-white to-amber-50 px-4 py-10 text-slate-800">
-      <div className="mx-auto max-w-5xl overflow-hidden rounded-4xl border border-rose-100 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)]">
+    <div className="auth-page min-h-screen bg-linear-to-br from-rose-50 via-white to-amber-50 px-4 py-10 text-slate-800">
+      <div className="auth-card mx-auto max-w-5xl overflow-hidden rounded-4xl border border-rose-100 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)]">
         <div className="grid md:grid-cols-2">
-          <div className="hidden bg-linear-to-br from-rose-500 via-pink-500 to-amber-400 p-10 text-white md:flex md:flex-col md:justify-between">
+          <div className="auth-intro bg-linear-to-br from-rose-500 via-pink-500 to-amber-400 p-10 text-white">
             <div>
               <div className="text-sm uppercase tracking-[0.2em] text-rose-100">My Little Baby</div>
               <h1 className="mt-6 text-4xl font-semibold">Acompanhe a rotina do seu bebê com calma e confiança.</h1>
@@ -28,6 +52,7 @@ function AuthCard({ mode }: { mode: AuthMode }) {
             <div className="flex justify-between rounded-full bg-slate-100 p-1">
               <button
                 type="button"
+                aria-pressed={!isRegister}
                 onClick={() => setIsRegister(false)}
                 className={`flex-1 rounded-full px-4 py-2 text-sm font-medium ${
                   !isRegister ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
@@ -37,6 +62,7 @@ function AuthCard({ mode }: { mode: AuthMode }) {
               </button>
               <button
                 type="button"
+                aria-pressed={isRegister}
                 onClick={() => setIsRegister(true)}
                 className={`flex-1 rounded-full px-4 py-2 text-sm font-medium ${
                   isRegister ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
@@ -60,13 +86,16 @@ function AuthCard({ mode }: { mode: AuthMode }) {
               </p>
             </div>
 
-            <form className="mt-8 space-y-4">
+            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               {isRegister ? (
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                   <FiUser className="text-slate-400" />
                   <input
+                    aria-label="Nome completo"
                     className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400"
+                    name="name"
                     placeholder="Nome completo"
+                    required
                   />
                 </div>
               ) : null}
@@ -74,18 +103,27 @@ function AuthCard({ mode }: { mode: AuthMode }) {
               <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <FiMail className="text-slate-400" />
                 <input
+                  aria-label="E-mail"
                   className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400"
                   placeholder="E-mail"
+                  name="email"
                   type="email"
+                  autoComplete="email"
+                  required
                 />
               </div>
 
               <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <FiLock className="text-slate-400" />
                 <input
+                  aria-label="Senha"
                   className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400"
                   placeholder="Senha"
+                  name="password"
                   type="password"
+                  autoComplete={isRegister ? 'new-password' : 'current-password'}
+                  minLength={6}
+                  required
                 />
               </div>
 
@@ -93,9 +131,14 @@ function AuthCard({ mode }: { mode: AuthMode }) {
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                   <FiLock className="text-slate-400" />
                   <input
+                    aria-label="Confirmar senha"
                     className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400"
                     placeholder="Confirmar senha"
+                    name="passwordConfirmation"
                     type="password"
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
                   />
                 </div>
               ) : null}
@@ -127,6 +170,10 @@ function AuthCard({ mode }: { mode: AuthMode }) {
                   Configurar
                 </Link>
               </div>
+
+              <Link className="auth-home-link" to="/">
+                Voltar para a página inicial
+              </Link>
             </div>
           </div>
         </div>

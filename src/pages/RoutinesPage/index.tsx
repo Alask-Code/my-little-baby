@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiFilter, FiHeart, FiMoon, FiPlus, FiThermometer, FiWind } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type RoutineEntry } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 const routineSummary = [
   { label: 'Amamentação', value: '3 registros', detail: 'Última às 08:10', icon: FiHeart },
@@ -11,7 +12,9 @@ const routineSummary = [
 ];
 
 export default function RoutinesPage() {
+  const { openDialog } = useDemoUi();
   const [entries, setEntries] = useState<RoutineEntry[]>([]);
+  const [activeFilter, setActiveFilter] = useState('Todas');
 
   useEffect(() => {
     let active = true;
@@ -25,6 +28,38 @@ export default function RoutinesPage() {
     };
   }, []);
 
+  const addRoutine = () => {
+    openDialog({
+      title: 'Adicionar à rotina',
+      description: 'Registre um novo cuidado para manter a linha do tempo em dia.',
+      submitLabel: 'Adicionar registro',
+      fields: [
+        {
+          name: 'tag',
+          label: 'Categoria',
+          type: 'select',
+          options: ['Amamentação', 'Mamadeira', 'Ordenha', 'Fralda', 'Sono', 'Humor']
+        },
+        { name: 'title', label: 'O que aconteceu?', type: 'text', placeholder: 'Ex.: soneca da tarde', required: true },
+        { name: 'time', label: 'Horário', type: 'time', required: true },
+        { name: 'description', label: 'Observação', type: 'textarea', placeholder: 'Adicione um detalhe (opcional)' }
+      ],
+      onSubmit: (values) => {
+        const time = values.time || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const entry = {
+          id: `demo-${Date.now()}`,
+          time,
+          title: values.title,
+          description: values.description || 'Adicionado agora no modo demonstração.',
+          tag: values.tag
+        };
+        mockApi.addRoutineEntry(entry);
+        setEntries((current) => [entry, ...current]);
+        return 'Registro adicionado à rotina desta sessão.';
+      }
+    });
+  };
+
   return (
     <AppShell
       title="Rotina diária"
@@ -32,6 +67,7 @@ export default function RoutinesPage() {
       actions={
         <button
           type="button"
+          onClick={addRoutine}
           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-rose-200 hover:bg-rose-600"
         >
           <FiPlus />
@@ -46,10 +82,20 @@ export default function RoutinesPage() {
             Hoje
           </div>
           <div className="flex flex-wrap gap-2 text-xs text-slate-600">
-            {['Amamentação', 'Mamadeira', 'Ordenha', 'Fralda', 'Sono', 'Humor'].map((tag) => (
-              <span key={tag} className="rounded-full border border-slate-200 bg-white px-2.5 py-1.5">
+            {['Todas', 'Amamentação', 'Mamadeira', 'Ordenha', 'Fralda', 'Sono', 'Humor'].map((tag) => (
+              <button
+                aria-pressed={activeFilter === tag}
+                key={tag}
+                onClick={() => setActiveFilter(tag)}
+                type="button"
+                className={`rounded-full border px-2.5 py-1.5 ${
+                  activeFilter === tag
+                    ? 'border-rose-300 bg-rose-50 text-rose-700'
+                    : 'border-slate-200 bg-white text-slate-600'
+                }`}
+              >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         </div>
@@ -71,24 +117,31 @@ export default function RoutinesPage() {
       <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 text-xs uppercase tracking-[0.2em] text-rose-500">Últimos registros</div>
         <div className="space-y-4">
-          {entries.map(({ time, title, description, tag }) => (
-            <div key={`${time}-${title}`} className="flex gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <div className="flex w-16 shrink-0 flex-col items-center text-center">
-                <div className="text-sm font-medium text-slate-900">{time}</div>
-                <div className="mt-1 h-8 w-px bg-slate-200" />
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="text-lg font-medium text-slate-900">{title}</div>
-                  <span className="rounded-full bg-rose-100 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-rose-600">
-                    {tag}
-                  </span>
+          {entries
+            .filter(({ tag }) => activeFilter === 'Todas' || tag === activeFilter)
+            .map(({ id, time, title, description, tag }) => (
+              <div key={id} className="flex gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="flex w-16 shrink-0 flex-col items-center text-center">
+                  <div className="text-sm font-medium text-slate-900">{time}</div>
+                  <div className="mt-1 h-8 w-px bg-slate-200" />
                 </div>
-                <p className="mt-2 text-sm text-slate-500">{description}</p>
+
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-lg font-medium text-slate-900">{title}</div>
+                    <span className="rounded-full bg-rose-100 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-rose-600">
+                      {tag}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-500">{description}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          {entries.filter(({ tag }) => activeFilter === 'Todas' || tag === activeFilter).length === 0 ? (
+            <p className="rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">
+              Ainda não há registros nesta categoria.
+            </p>
+          ) : null}
         </div>
       </section>
     </AppShell>

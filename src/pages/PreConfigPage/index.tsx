@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiArrowRight, FiCheck, FiHeart, FiMoon, FiUser } from 'react-icons/fi';
+import { useDemoUi } from '../../components/DemoUi';
+import { mockApi } from '../../mockApi';
 
 const steps = [
   { label: 'Perfil do bebê', description: 'Nome, data de nascimento e foto', icon: FiUser },
@@ -9,8 +11,29 @@ const steps = [
 ];
 
 export default function PreConfigPage() {
+  const { openDialog } = useDemoUi();
+  const navigate = useNavigate();
+
+  const saveProfile = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get('babyName') ?? '').trim();
+
+    openDialog({
+      title: `Tudo pronto${name ? ` para ${name}` : ''}?`,
+      description: 'Este perfil de exemplo ficará disponível apenas nesta demonstração local.',
+      submitLabel: 'Abrir painel',
+      fields: [],
+      onSubmit: () => {
+        mockApi.updateBabyName(name);
+        navigate('/app/');
+        return 'Perfil de demonstração configurado; os dados continuam apenas na memória local.';
+      }
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-rose-50 via-white to-amber-50 px-4 py-10 text-slate-800">
+    <div className="setup-page min-h-screen bg-linear-to-br from-rose-50 via-white to-amber-50 px-4 py-10 text-slate-800">
       <div className="mx-auto max-w-5xl rounded-4xl border border-rose-100 bg-white p-6 shadow-[0_30px_80px_rgba(15,23,42,0.08)] sm:p-8">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -48,7 +71,7 @@ export default function PreConfigPage() {
             ))}
           </div>
 
-          <form className="space-y-5 rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+          <form className="space-y-5 rounded-[28px] border border-slate-200 bg-slate-50 p-5" onSubmit={saveProfile}>
             <div>
               <label htmlFor="babyName" className="mb-2 block text-sm font-medium text-slate-700">
                 Nome do bebê
@@ -56,6 +79,8 @@ export default function PreConfigPage() {
                   id="babyName"
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm placeholder:text-slate-400"
                   placeholder="Ex.: Luna"
+                  name="babyName"
+                  required
                 />
               </label>
             </div>
@@ -66,7 +91,9 @@ export default function PreConfigPage() {
                   Data de nascimento
                   <input
                     id="birthDate"
+                    name="birthDate"
                     type="date"
+                    required
                     className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
                   />
                 </label>
@@ -115,7 +142,11 @@ export default function PreConfigPage() {
               <div>
                 <label htmlFor="notifications" className="mb-2 block text-sm font-medium text-slate-700">
                   Notificações
-                  <select className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                  <select
+                    id="notifications"
+                    name="notifications"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
+                  >
                     <option>Ativar lembretes</option>
                     <option>Somente lembretes essenciais</option>
                     <option>Desativar</option>
@@ -130,13 +161,13 @@ export default function PreConfigPage() {
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link
-                to="/app/"
-                className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-rose-200  hover:bg-rose-600"
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-rose-200 hover:bg-rose-600"
               >
                 Salvar perfil
                 <FiArrowRight />
-              </Link>
+              </button>
               <Link
                 to="/app/login"
                 className="inline-flex items-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-700  hover:border-rose-200 hover:text-rose-600"

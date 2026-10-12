@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   FiActivity,
+  FiBarChart2,
   FiBell,
   FiBookOpen,
-  FiBarChart2,
+  FiGrid,
   FiHeart,
   FiHome,
   FiSettings,
@@ -20,10 +21,13 @@ const navigation = [
   { to: '/app/reports', label: 'Relatórios', icon: FiBarChart2 },
   { to: '/app/notifications', label: 'Lembretes', icon: FiBell },
   { to: '/app/alimentary-introduction', label: 'Introdução alimentar', icon: FiBookOpen },
-  { to: '/app/parent-linking', label: 'Pais & cuidadores', icon: FiUsers },
+  { to: '/app/parent-linking', label: 'Família', icon: FiUsers },
   { to: '/app/settings', label: 'Configurações', icon: FiSettings },
   { to: '/app/privacy-policy', label: 'Privacidade', icon: FiShield }
 ];
+
+const mobileNavigation = navigation.slice(0, 4);
+const moreNavigation = navigation.slice(4);
 
 type AppShellProps = {
   title: string;
@@ -33,19 +37,20 @@ type AppShellProps = {
 };
 
 export default function AppShell({ title, subtitle, children, actions }: AppShellProps) {
+  const { pathname } = useLocation();
   const [profile, setProfile] = useState<BabyProfile>({
     name: 'Luna',
     ageLabel: '7 meses · 1 dia',
     role: 'Responsável principal'
   });
+  const [moreOpen, setMoreOpen] = useState(false);
+  const morePageActive = moreNavigation.some(({ to }) => pathname === to || pathname.startsWith(`${to}/`));
 
   useEffect(() => {
     let active = true;
 
     mockApi.getBabyProfile().then((nextProfile) => {
-      if (active) {
-        setProfile(nextProfile);
-      }
+      if (active) setProfile(nextProfile);
     });
 
     return () => {
@@ -54,81 +59,131 @@ export default function AppShell({ title, subtitle, children, actions }: AppShel
   }, []);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-rose-50 via-white to-amber-50 text-slate-800">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex gap-6">
-          <aside className="hidden w-72 shrink-0 flex-col rounded-[28px] border border-rose-100 bg-white/80 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur lg:flex">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-rose-400 to-pink-500 text-lg font-semibold text-white shadow-md">
-                ML
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-slate-900">My Little Baby</div>
-                <div className="text-xs text-slate-500">Acompanhamento diário</div>
+    <div className="app-shell">
+      <div className="app-layout">
+        <aside className="app-sidebar">
+          <NavLink className="app-brand" to="/app/">
+            <span aria-hidden="true" className="app-brand-mark">
+              ml
+            </span>
+            <span>
+              <strong>My Little Baby</strong>
+              <small>Um dia de cada vez</small>
+            </span>
+          </NavLink>
+
+          <div className="baby-profile">
+            <span aria-hidden="true" className="baby-avatar">
+              👶
+            </span>
+            <span>
+              <strong>{profile.name}</strong>
+              <small>{profile.ageLabel}</small>
+            </span>
+            <span aria-label="Perfil selecionado" className="profile-dot" />
+          </div>
+
+          <span className="nav-caption">MENU</span>
+          <nav aria-label="Navegação principal" className="app-navigation">
+            {navigation.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                end={to === '/app/'}
+                key={to}
+                to={to}
+                className={({ isActive }) => `app-nav-link${isActive ? ' is-active' : ''}`}
+              >
+                <Icon aria-hidden="true" />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="sidebar-note">
+            <span aria-hidden="true">🌿</span>
+            <div>
+              <strong>Sem pressa.</strong>
+              <p>Cada família encontra seu próprio ritmo.</p>
+            </div>
+          </div>
+        </aside>
+
+        <main className="app-main">
+          <header className="app-header">
+            <div className="app-heading">
+              <span className="demo-eyebrow">SEU ESPAÇO DE CUIDADO</span>
+              <h1>{title}</h1>
+              {subtitle ? <p>{subtitle}</p> : null}
+              <div className="baby-context">
+                <span aria-hidden="true">👶</span>
+                <span>
+                  <strong>{profile.name}</strong>
+                  <small>{profile.ageLabel}</small>
+                </span>
               </div>
             </div>
-
-            <div className="mt-6 rounded-2xl bg-linear-to-r from-rose-50 to-amber-50 p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-200 text-xl">👶</div>
-                <div>
-                  <div className="font-medium text-slate-900">{profile.name}</div>
-                  <div className="text-xs text-slate-500">{profile.ageLabel}</div>
-                </div>
+            <div className="header-tools">
+              {actions}
+              <div className="account-chip">
+                <span className="account-avatar">M</span>
+                <span>
+                  <strong>Maria</strong>
+                  <small>{profile.role}</small>
+                </span>
               </div>
             </div>
+          </header>
 
-            <nav className="mt-6 space-y-2">
-              {navigation.map(({ to, label, icon: Icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-2xl px-3 py-3 text-sm ${
-                      isActive
-                        ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
-                        : 'text-slate-600 hover:bg-rose-50 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  <Icon className="text-base" />
-                  {label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="mt-auto rounded-2xl border border-dashed border-rose-200 bg-rose-50 p-4">
-              <div className="text-xs font-medium uppercase tracking-[0.14em] text-rose-500">Hoje</div>
-              <div className="mt-2 text-sm text-slate-700">Próxima soneca estimada em 1h40</div>
+          {import.meta.env.DEV ? (
+            <div className="demo-mode-note">
+              <span className="demo-badge">PRÉVIA LOCAL</span>
+              <span>Dados simulados; alterações ficam na memória e não são sincronizadas.</span>
             </div>
-          </aside>
+          ) : null}
 
-          <main className="flex-1">
-            <header className="mb-6 flex flex-col gap-4 rounded-[28px] border border-rose-100 bg-white/80 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="text-xs font-medium uppercase tracking-[0.2em] text-rose-500">Painel da família</div>
-                <h1 className="mt-2 text-2xl font-semibold text-slate-900">{title}</h1>
-                {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {actions}
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-amber-300 to-rose-400 text-sm font-semibold text-white">
-                    M
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-slate-800">Maria</div>
-                    <div className="text-[11px] text-slate-500">{profile.role}</div>
-                  </div>
-                </div>
-              </div>
-            </header>
-
-            {children}
-          </main>
-        </div>
+          <div className="page-content">{children}</div>
+          <footer className="app-footer">Um espaço tranquilo para acompanhar cada pequena conquista.</footer>
+        </main>
       </div>
+
+      <nav aria-label="Navegação móvel" className="mobile-navigation">
+        {mobileNavigation.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            end={to === '/app/'}
+            key={to}
+            to={to}
+            className={({ isActive }) => `mobile-nav-link${isActive ? ' is-active' : ''}`}
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+        <button
+          aria-expanded={moreOpen}
+          aria-label="Mais páginas"
+          className={`mobile-nav-link${moreOpen || morePageActive ? ' is-active' : ''}`}
+          onClick={() => setMoreOpen(!moreOpen)}
+          type="button"
+        >
+          <FiGrid aria-hidden="true" />
+          <span>Mais</span>
+        </button>
+      </nav>
+
+      {moreOpen ? (
+        <div className="mobile-more-menu">
+          {moreNavigation.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              onClick={() => setMoreOpen(false)}
+              to={to}
+              className={({ isActive }) => `mobile-more-link${isActive ? ' is-active' : ''}`}
+            >
+              <Icon aria-hidden="true" />
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

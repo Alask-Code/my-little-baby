@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FiCheck, FiLink2, FiPlus, FiUsers } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type Caregiver } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 export default function ParentLinkingPage() {
+  const { openDialog, notify } = useDemoUi();
   const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
 
   useEffect(() => {
@@ -18,6 +20,41 @@ export default function ParentLinkingPage() {
     };
   }, []);
 
+  const inviteCaregiver = () => {
+    openDialog({
+      title: 'Convidar alguém de confiança',
+      description: 'Este convite é uma prévia; nenhum acesso real será concedido.',
+      submitLabel: 'Preparar convite',
+      fields: [
+        { name: 'name', label: 'Nome', type: 'text', placeholder: 'Nome do cuidador', required: true },
+        { name: 'email', label: 'E-mail', type: 'email', placeholder: 'nome@exemplo.com', required: true },
+        { name: 'role', label: 'Relação com o bebê', type: 'text', placeholder: 'Ex.: avó, cuidador', required: true }
+      ],
+      onSubmit: (values) => {
+        const caregiver = {
+          id: `demo-${Date.now()}`,
+          name: values.name,
+          role: values.role,
+          status: 'Convite preparado',
+          accent: 'amber' as const
+        };
+        mockApi.addCaregiver(caregiver);
+        setCaregivers((current) => [caregiver, ...current]);
+        return `Prévia de convite preparada para ${values.email}.`;
+      }
+    });
+  };
+
+  const copyInviteLink = async () => {
+    try {
+      if (!navigator.clipboard) throw new Error('A área de transferência não está disponível neste navegador.');
+      await navigator.clipboard.writeText('https://mylittlebaby.app/invite/luna-family');
+      notify('Link de demonstração copiado.');
+    } catch {
+      notify('Não foi possível copiar automaticamente. Selecione e copie o link exibido.');
+    }
+  };
+
   return (
     <AppShell
       title="Pessoas autorizadas"
@@ -25,6 +62,7 @@ export default function ParentLinkingPage() {
       actions={
         <button
           type="button"
+          onClick={inviteCaregiver}
           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-rose-200  hover:bg-rose-600"
         >
           <FiPlus />
@@ -88,6 +126,10 @@ export default function ParentLinkingPage() {
             <div className="mt-2 break-all rounded-xl bg-white p-3 text-xs text-slate-500">
               https://mylittlebaby.app/invite/luna-family
             </div>
+            <button className="demo-button demo-button-secondary mt-3" onClick={copyInviteLink} type="button">
+              <FiLink2 />
+              Copiar link
+            </button>
           </div>
 
           <div className="mt-5 space-y-3">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiBarChart2, FiDownload, FiTrendingUp } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type ReportStat } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 const chart = [
   { day: 'Seg', value: 62 },
@@ -14,6 +15,7 @@ const chart = [
 ];
 
 export default function ReportsPage() {
+  const { notify } = useDemoUi();
   const [stats, setStats] = useState<ReportStat[]>([]);
 
   useEffect(() => {
@@ -28,6 +30,23 @@ export default function ReportsPage() {
     };
   }, []);
 
+  const exportReport = () => {
+    const escapeCell = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const csv = [['Indicador', 'Valor', 'Período'], ...stats.map(({ label, value, detail }) => [label, value, detail])]
+      .map((row) => row.map(escapeCell).join(','))
+      .join('\n');
+    const file = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'relatorio-my-little-baby-demo.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    notify('Relatório de demonstração exportado em CSV.');
+  };
+
   return (
     <AppShell
       title="Relatórios"
@@ -35,6 +54,7 @@ export default function ReportsPage() {
       actions={
         <button
           type="button"
+          onClick={exportReport}
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-rose-200 hover:text-rose-600"
         >
           <FiDownload />

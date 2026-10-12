@@ -263,6 +263,12 @@ const privacySections: PrivacySection[] = [
   }
 ];
 
+let demoBabyProfile = { ...babyProfile };
+let demoRoutineEntries = [...routineEntries];
+let demoMilestones = [...milestones];
+let demoNotificationItems = [...notificationItems];
+let demoCaregivers = [...caregivers];
+
 export const mockApi = {
   getPublicHighlights: async () => {
     await wait();
@@ -270,7 +276,7 @@ export const mockApi = {
   },
   getBabyProfile: async () => {
     await wait();
-    return babyProfile;
+    return { ...demoBabyProfile };
   },
   getDashboardCards: async () => {
     await wait();
@@ -286,11 +292,17 @@ export const mockApi = {
   },
   getRoutineEntries: async () => {
     await wait();
-    return routineEntries;
+    return [...demoRoutineEntries];
+  },
+  addRoutineEntry: (entry: RoutineEntry) => {
+    demoRoutineEntries = [entry, ...demoRoutineEntries];
   },
   getMilestones: async () => {
     await wait();
-    return milestones;
+    return [...demoMilestones];
+  },
+  addMilestone: (milestone: Milestone) => {
+    demoMilestones = [milestone, ...demoMilestones];
   },
   getReportStats: async () => {
     await wait();
@@ -298,11 +310,25 @@ export const mockApi = {
   },
   getNotificationItems: async () => {
     await wait();
-    return notificationItems;
+    return [...demoNotificationItems];
+  },
+  addNotification: (notification: NotificationItem) => {
+    demoNotificationItems = [notification, ...demoNotificationItems];
+  },
+  toggleNotification: (id: string) => {
+    demoNotificationItems = demoNotificationItems.map((notification) =>
+      notification.id === id ? { ...notification, active: !notification.active } : notification
+    );
   },
   getCaregivers: async () => {
     await wait();
-    return caregivers;
+    return [...demoCaregivers];
+  },
+  addCaregiver: (caregiver: Caregiver) => {
+    demoCaregivers = [caregiver, ...demoCaregivers];
+  },
+  updateBabyName: (name: string) => {
+    demoBabyProfile = { ...demoBabyProfile, name };
   },
   getEducationalModules: async () => {
     await wait();

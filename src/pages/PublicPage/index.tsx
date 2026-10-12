@@ -29,7 +29,7 @@ export default function PublicPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-rose-50 to-rose-100 text-slate-800">
+    <div className="landing-page min-h-screen bg-linear-to-br from-rose-50 to-rose-100 text-slate-800">
       <Header />
 
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
@@ -61,9 +61,9 @@ export default function PublicPage() {
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
+            <div className="landing-trust-list mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
               {trustItems.map((item) => (
-                <TagText Icon={FiShield} label={item} />
+                <TagText Icon={FiShield} key={item} label={item} />
               ))}
             </div>
           </div>

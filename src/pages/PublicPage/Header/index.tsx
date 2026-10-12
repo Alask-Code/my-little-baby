@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
-    <header className="flex w-full h-fit items-center border-b border-rose-300 justify-between p-2 px-4 max-[413px]:px-2">
-      <div className="flex items-center gap-4">
+    <header className="landing-header">
+      <div className="landing-brand">
         <div className="flex size-12 border border-rose-400 items-center justify-center rounded-2xl bg-linear-to-br from-rose-200 to-rose-400 text-lg font-semibold text-white shadow-md">
           MlB
         </div>
@@ -14,7 +14,7 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="flex items-center text-sm font-medium p-1 rounded-full border border-rose-300 bg-rose-200">
+      <div className="landing-actions">
         <Link to="/app/login" className="text-rose-400 px-4 py-2">
           Entrar
         </Link>

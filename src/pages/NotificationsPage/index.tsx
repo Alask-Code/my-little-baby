@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { FiBell, FiCheck, FiClock, FiPlus } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type NotificationItem } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 export default function NotificationsPage() {
+  const { openDialog } = useDemoUi();
   const [reminders, setReminders] = useState<NotificationItem[]>([]);
+  const [preferences, setPreferences] = useState([true, true, false, false]);
 
   useEffect(() => {
     let active = true;
@@ -18,6 +21,31 @@ export default function NotificationsPage() {
     };
   }, []);
 
+  const addReminder = () => {
+    openDialog({
+      title: 'Criar lembrete',
+      description: 'Adicione um lembrete de teste para a rotina da família.',
+      submitLabel: 'Criar lembrete',
+      fields: [
+        { name: 'title', label: 'O que lembrar?', type: 'text', placeholder: 'Ex.: hora da fruta', required: true },
+        { name: 'time', label: 'Horário', type: 'time', required: true },
+        { name: 'type', label: 'Repetição', type: 'select', options: ['Agendada', 'Diária', 'Semanal'] }
+      ],
+      onSubmit: (values) => {
+        const reminder = {
+          id: `demo-${Date.now()}`,
+          title: values.title,
+          time: values.time,
+          type: values.type,
+          active: true
+        };
+        mockApi.addNotification(reminder);
+        setReminders((current) => [reminder, ...current]);
+        return 'Lembrete criado nesta sessão.';
+      }
+    });
+  };
+
   return (
     <AppShell
       title="Lembretes e notificações"
@@ -25,6 +53,7 @@ export default function NotificationsPage() {
       actions={
         <button
           type="button"
+          onClick={addReminder}
           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-rose-200  hover:bg-rose-600"
         >
           <FiPlus />
@@ -53,13 +82,23 @@ export default function NotificationsPage() {
 
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-slate-500">{time}</div>
-                  <div
-                    className={`inline-flex h-6 w-11 items-center rounded-full p-1 ${
-                      active ? 'bg-emerald-500' : 'bg-slate-300'
-                    }`}
+                  <button
+                    aria-checked={active}
+                    aria-label={`${active ? 'Desativar' : 'Ativar'} lembrete ${title}`}
+                    className="demo-toggle"
+                    onClick={() => {
+                      mockApi.toggleNotification(id);
+                      setReminders((current) =>
+                        current.map((reminder) =>
+                          reminder.id === id ? { ...reminder, active: !reminder.active } : reminder
+                        )
+                      );
+                    }}
+                    role="switch"
+                    type="button"
                   >
-                    <div className={`h-4 w-4 rounded-full bg-white  ${active ? 'translate-x-5' : ''}`} />
-                  </div>
+                    <span />
+                  </button>
                 </div>
               </div>
             ))}
@@ -72,16 +111,39 @@ export default function NotificationsPage() {
 
           <div className="mt-5 space-y-4">
             {[
-              'Notificações push habilitadas',
-              'Lembretes visuais na tela',
-              'Avisos de sono em horário de descanso',
+              'Notificações push',
+              'Lembretes visuais',
+              'Avisos de sono no horário de descanso',
               'Relatórios diários por e-mail'
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                  <FiCheck />
+            ].map((item, index) => (
+              <div
+                key={item}
+                className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3 text-sm text-slate-600"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                      preferences[index] ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'
+                    }`}
+                  >
+                    <FiCheck />
+                  </div>
+                  {item}
                 </div>
-                {item}
+                <button
+                  aria-checked={preferences[index]}
+                  aria-label={`${preferences[index] ? 'Desativar' : 'Ativar'} ${item.toLowerCase()}`}
+                  className="demo-toggle"
+                  onClick={() =>
+                    setPreferences((current) =>
+                      current.map((enabled, itemIndex) => (itemIndex === index ? !enabled : enabled))
+                    )
+                  }
+                  role="switch"
+                  type="button"
+                >
+                  <span />
+                </button>
               </div>
             ))}
           </div>

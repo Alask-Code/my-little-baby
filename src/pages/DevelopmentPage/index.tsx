@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiCamera, FiCheck, FiGift, FiHeart, FiPlus } from 'react-icons/fi';
 import AppShell from '../AppShell';
 import { mockApi, type Milestone } from '../../mockApi';
+import { useDemoUi } from '../../components/DemoUi';
 
 const gallery = ['👶', '🍼', '🌞', '🎈'];
 const accentClasses: Record<string, string> = {
@@ -12,7 +13,9 @@ const accentClasses: Record<string, string> = {
 };
 
 export default function DevelopmentPage() {
+  const { openDialog } = useDemoUi();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [memories, setMemories] = useState(() => gallery.map((emoji, index) => ({ id: `memory-${index}`, emoji })));
 
   useEffect(() => {
     let active = true;
@@ -26,6 +29,57 @@ export default function DevelopmentPage() {
     };
   }, []);
 
+  const addMilestone = () => {
+    openDialog({
+      title: 'Nova conquista',
+      description: 'Guarde um marco importante do desenvolvimento.',
+      submitLabel: 'Salvar marco',
+      fields: [
+        { name: 'title', label: 'Conquista', type: 'text', placeholder: 'Ex.: bate palminhas', required: true },
+        {
+          name: 'category',
+          label: 'Área',
+          type: 'select',
+          options: ['Motor', 'Linguagem', 'Interação social', 'Alimentação', 'Outro']
+        },
+        { name: 'date', label: 'Data', type: 'date', required: true }
+      ],
+      onSubmit: (values) => {
+        const milestone = {
+          id: `demo-${Date.now()}`,
+          title: values.title,
+          category: values.category,
+          age: 'Novo registro',
+          status: 'Adicionado hoje',
+          accent: 'rose' as const
+        };
+        mockApi.addMilestone(milestone);
+        setMilestones((current) => [milestone, ...current]);
+        return 'Conquista adicionada à linha do tempo.';
+      }
+    });
+  };
+
+  const addMemory = () => {
+    openDialog({
+      title: 'Adicionar memória',
+      description: 'Escolha um símbolo para representar uma foto nesta prévia local.',
+      submitLabel: 'Adicionar memória',
+      fields: [
+        {
+          name: 'memory',
+          label: 'Memória',
+          type: 'select',
+          options: ['📸', '🧸', '🌈', '🌻', '🫧', '🎈']
+        }
+      ],
+      onSubmit: (values) => {
+        setMemories((current) => [{ id: `memory-${Date.now()}`, emoji: values.memory }, ...current]);
+        return 'Memória adicionada à galeria da sessão.';
+      }
+    });
+  };
+
   return (
     <AppShell
       title="Desenvolvimento"
@@ -33,6 +87,7 @@ export default function DevelopmentPage() {
       actions={
         <button
           type="button"
+          onClick={addMilestone}
           className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-rose-200 hover:bg-rose-600"
         >
           <FiPlus />
@@ -47,7 +102,9 @@ export default function DevelopmentPage() {
               <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Marcos</div>
               <h2 className="mt-2 text-xl font-semibold text-slate-900">Conquistas recentes</h2>
             </div>
-            <div className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-600">4 ativos</div>
+            <div className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-600">
+              {milestones.length} marcos
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -84,15 +141,20 @@ export default function DevelopmentPage() {
               <div className="text-xs uppercase tracking-[0.2em] text-rose-500">Galeria</div>
               <h2 className="mt-2 text-xl font-semibold text-slate-900">Memórias</h2>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+            <button
+              aria-label="Adicionar memória"
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500"
+              onClick={addMemory}
+              type="button"
+            >
               <FiCamera />
-            </div>
+            </button>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
-            {gallery.map((emoji) => (
+            {memories.map(({ id, emoji }) => (
               <div
-                key={emoji}
+                key={id}
                 className="flex h-28 items-center justify-center rounded-3xl bg-linear-to-br from-rose-50 to-amber-50 text-4xl shadow-inner ring-1 ring-slate-100"
               >
                 {emoji}
