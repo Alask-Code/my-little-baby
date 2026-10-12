@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiArrowRight, FiBell, FiBookOpen, FiCalendar, FiHeart, FiShield, FiStar, FiUser } from 'react-icons/fi';
 import { mockApi, type PublicHighlight } from '../../mockApi';
 import Header from './Header';
+import TagText from './Header/TagText';
 
 const trustItems = [
   'Registro de rotina infantil em poucos cliques',
@@ -34,11 +35,7 @@ export default function PublicPage() {
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         <section className="grid items-center gap-10 py-12 lg:grid-cols-[1.2fr_0.8fr] lg:py-20">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-rose-400">
-              <FiStar />
-              Cuidar com clareza
-            </div>
-
+            <TagText Icon={FiStar} label="Cuidar com Clareza" compact />
             <h1 className="mt-6 max-w-xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
               O diário da rotina do seu bebê em um só lugar.
             </h1>
@@ -51,14 +48,14 @@ export default function PublicPage() {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/app/register"
-                className="inline-flex items-center gap-2 rounded-full bg-linear-to-br from-rose-200 to-rose-400 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-rose-200  hover:bg-rose-600"
+                className="inline-flex items-center gap-2 rounded-full bg-linear-to-br from-rose-200 to-rose-400 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-rose-200"
               >
                 Começar agora
                 <FiArrowRight />
               </Link>
               <Link
                 to="/app/login"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700  hover:border-rose-200 hover:text-rose-600"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700"
               >
                 Já tenho conta
               </Link>
@@ -66,13 +63,7 @@ export default function PublicPage() {
 
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
               {trustItems.map((item) => (
-                <div
-                  key={item}
-                  className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-2 ring-1 ring-slate-200"
-                >
-                  <FiShield className="text-rose-500" />
-                  {item}
-                </div>
+                <TagText Icon={FiShield} label={item} />
               ))}
             </div>
           </div>

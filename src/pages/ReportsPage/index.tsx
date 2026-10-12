@@ -44,7 +44,7 @@ export default function ReportsPage() {
     >
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map(({ id, label, value, detail }) => (
-          <article key={id} className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+          <article key={id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="text-sm text-slate-500">{label}</div>
             <div className="mt-2 text-2xl font-semibold text-slate-900">{value}</div>
             <div className="mt-1 text-xs text-slate-500">{detail}</div>
@@ -69,7 +69,7 @@ export default function ReportsPage() {
             {chart.map(({ day, value }) => (
               <div key={day} className="flex flex-1 flex-col items-center gap-3">
                 <div
-                  className="flex h-40 w-full items-end justify-center rounded-t-[18px] bg-gradient-to-t from-rose-500 to-pink-300"
+                  className="flex h-40 w-full items-end justify-center rounded-t-[18px] bg-linear-to-t from-rose-500 to-pink-300"
                   style={{ height: `${value}%` }}
                 />
                 <div className="text-xs text-slate-500">{day}</div>
@@ -97,7 +97,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-rose-400 to-pink-500"
+                    className="h-full rounded-full bg-linear-to-r from-rose-400 to-pink-500"
                     style={{ width: progress }}
                   />
                 </div>

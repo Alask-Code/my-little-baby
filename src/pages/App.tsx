@@ -15,10 +15,9 @@ import PrivacyPolicyPage from './PrivacyPolicyPage';
 
 export default function App() {
   return (
-    <Router useTransitions>
+    <Router useTransitions basename="/my-little-baby">
       <Routes>
-        <Route path="/" Component={PublicPage} />
-        <Route path="/my-little-baby" Component={PublicPage} />
+        <Route path="/" Component={PublicPage} index />
         <Route path="app/register" Component={Auth.RegisterPage} />
         <Route path="app/login" Component={Auth.LoginPage} />
         <Route path="app/preconfig" Component={PreConfigPage} />
